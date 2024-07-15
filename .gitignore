@@ -5,6 +5,9 @@ __pycache__/
 # Virtual environment files
 venv/
 
+# Local development database
+db.sqlite3
+
 # Local static files
 staticfiles/
 

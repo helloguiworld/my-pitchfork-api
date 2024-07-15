@@ -33,7 +33,7 @@ DEBUG = True
 
 
 if os.environ.get('PRODUCTION'):
-    ALLOWED_HOSTS = ['mypitchfork.fun', 'api.mypitchfork.fun']
+    ALLOWED_HOSTS = ['mypitchfork.fun']
 else:
     ALLOWED_HOSTS = ['*']
 
@@ -65,7 +65,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+if os.environ.get('PRODUCTION'):
+    CORS_ALLOW_METHODS = ['GET']
+    CORS_ALLOWED_ORIGINS = [
+        "https://mypitchfork.fun",
+    ]
+else:
+    CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'mypitchfork.urls'
 
@@ -91,7 +97,7 @@ WSGI_APPLICATION = 'mypitchfork.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if os.environ.get('PRODUCTION'):
+if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"), conn_max_age=1800)
     }

@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-93!1&80ov-k3rhb-r_pvs(*3c0@(acqj2$407gjitk2ucgsn5h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mypitchfork.fun', 'api.mypitchfork.fun']
 
 
 # Application definition

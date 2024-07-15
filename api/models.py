@@ -7,6 +7,7 @@ class Share(models.Model):
     ]
     
     album_id = models.CharField(max_length=50)
+    album_name = models.CharField(max_length=100, default='Not specified')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     creation_date = models.DateTimeField(auto_now_add=True)
     

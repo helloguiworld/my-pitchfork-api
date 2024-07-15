@@ -1,0 +1,9 @@
+# System-generated files
+*.pyc
+__pycache__/
+
+# Virtual environment files
+venv/
+
+# Local configuration files
+.env

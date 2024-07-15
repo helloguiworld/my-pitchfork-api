@@ -33,7 +33,7 @@ DEBUG = True
 
 
 if os.environ.get('PRODUCTION'):
-    ALLOWED_HOSTS = ['mypitchfork.fun']
+    ALLOWED_HOSTS = ['api.mypitchfork.fun']
 else:
     ALLOWED_HOSTS = ['*']
 

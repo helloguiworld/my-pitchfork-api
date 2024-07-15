@@ -10,3 +10,8 @@ staticfiles/
 
 # Local configuration files
 .env
+.env*
+db.sqlite3
+
+# nohup
+nohup.out

@@ -31,13 +31,6 @@ SECRET_KEY = 'django-insecure-93!1&80ov-k3rhb-r_pvs(*3c0@(acqj2$407gjitk2ucgsn5h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
-if os.environ.get('PRODUCTION'):
-    ALLOWED_HOSTS = ['api.mypitchfork.fun']
-else:
-    ALLOWED_HOSTS = ['*']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -53,6 +46,16 @@ INSTALLED_APPS = [
     'users',
     'api',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -73,6 +76,11 @@ if os.environ.get('PRODUCTION'):
     ]
 else:
     CORS_ORIGIN_ALLOW_ALL = True
+    
+if os.environ.get('PRODUCTION'):
+    ALLOWED_HOSTS = ['api.mypitchfork.fun']
+else:
+    ALLOWED_HOSTS = ['*']
 
 ROOT_URLCONF = 'mypitchfork.urls'
 

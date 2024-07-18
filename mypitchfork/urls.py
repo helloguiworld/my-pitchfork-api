@@ -20,6 +20,7 @@ from rest_framework.routers import DefaultRouter
 
 # from users.views import AuthenticatedUserView
 # from rest_framework.authtoken.views import obtain_auth_token
+
 from api.views import ShareViewSet
 
 router = DefaultRouter()
@@ -28,6 +29,7 @@ router.register(r'share', ShareViewSet)
 urlpatterns = [
     # path('auth-user/', AuthenticatedUserView.as_view(), name='authenticated-user'),
     # path('api/token-auth/', obtain_auth_token, name='api_token_auth'),
+    path('spotify/', include('spotify.urls')),
     path('session-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
     path('', include(router.urls)),

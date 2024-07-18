@@ -11,12 +11,14 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from dotenv import load_dotenv
+from spotify.services.token import setup_spotify_token
 
 from pathlib import Path
 import os
 import dj_database_url
 
 load_dotenv()
+setup_spotify_token()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,6 +45,8 @@ INSTALLED_APPS = [
     
     'corsheaders',
     'rest_framework',
+    'common',
+    'spotify',
     'users',
     'api',
 ]

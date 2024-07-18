@@ -8,7 +8,7 @@ from .views import  SpotifyTokenView, SpotifySearchView, SpotifyAlbumView
 
 urlpatterns = [
     # path('', include(router.urls)),
-    path('album/<str:id>/', SpotifyAlbumView.as_view(), name='spotify-album'),
+    path('albums/<str:id>/', SpotifyAlbumView.as_view(), name='spotify-album'),
     path('search/', SpotifySearchView.as_view(), name='spotify-search'),
     path('token/', SpotifyTokenView.as_view(), name='spotify-token'),
 ]

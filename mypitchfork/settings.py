@@ -80,7 +80,7 @@ if os.environ.get('PRODUCTION'):
     ]
 else:
     CORS_ORIGIN_ALLOW_ALL = True
-    
+
 if os.environ.get('PRODUCTION'):
     ALLOWED_HOSTS = ['api.mypitchfork.fun']
 else:

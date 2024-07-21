@@ -7,9 +7,9 @@ from .views import  SpotifyTokenView, SpotifySearchView, SpotifyAlbumView, Clien
 # router.register(r'search', SpotifySearchView, basename='spotify-search')
 
 urlpatterns = [
-    path('ip/', ClientIpView.as_view(), name='client-ip'),
+    path('ip', ClientIpView.as_view(), name='client-ip'),
     # path('', include(router.urls)),
     path('albums/<str:id>/', SpotifyAlbumView.as_view(), name='spotify-album'),
-    path('search/', SpotifySearchView.as_view(), name='spotify-search'),
-    path('token/', SpotifyTokenView.as_view(), name='spotify-token'),
+    path('search', SpotifySearchView.as_view(), name='spotify-search'),
+    path('token', SpotifyTokenView.as_view(), name='spotify-token'),
 ]

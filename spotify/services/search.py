@@ -1,5 +1,5 @@
 import requests
-from ..exceptions import InvalidSpotifyToken
+from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 from ..services import get_spotify_token
 
 def search_albums(q):
@@ -21,5 +21,5 @@ def search_albums(q):
     elif response.status_code == 401:
         raise InvalidSpotifyToken
     else:
-        raise Exception(f"Failed to search albums: {response.status_code}, {response.text}")
+        raise SpotifyResponseException(response)
     

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Share
+from ..models import Share
 
 class ShareSerializer(serializers.ModelSerializer):
     class Meta:

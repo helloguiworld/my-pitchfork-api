@@ -45,19 +45,21 @@ INSTALLED_APPS = [
     
     'corsheaders',
     'rest_framework',
-    'common',
+    'rest_framework.authtoken',
+    
     'spotify',
+    'common',
     'users',
     'api',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'common.permissions.IsAdminOrMyOriginOrReadOnly',
+        'common.permissions.IsAdminOrMyOrigin',
     ),
 }
 

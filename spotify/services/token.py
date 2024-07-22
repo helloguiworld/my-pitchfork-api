@@ -1,6 +1,6 @@
 import os
 import requests
-from ..exceptions import InvalidSpotifyToken
+from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 
 def get_spotify_token_infos():
     token_url = "https://accounts.spotify.com/api/token"
@@ -60,7 +60,7 @@ def setup_spotify_token():
         raise e
 
 
-def execute_with_token_retry(action, *args, **kwargs):
+def execute_spotify_with_token_retry(action, *args, **kwargs):
     try:
         return action(*args, **kwargs)
     except InvalidSpotifyToken:

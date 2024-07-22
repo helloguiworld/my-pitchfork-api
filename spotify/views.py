@@ -1,10 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .services.token import get_spotify_token, execute_with_token_retry
+from .services.token import get_spotify_token, execute_spotify_with_token_retry
 from .services.search import search_albums
 from .services.albums import get_album
 from .services.client import get_client_ip
+from .exceptions import SpotifyResponseException
 
 from rest_framework.permissions import IsAdminUser
 
@@ -24,8 +25,10 @@ class SpotifySearchView(APIView):
         q = request.query_params.get('q', '')
 
         try:
-            search_result = execute_with_token_retry(search_albums, q)
+            search_result = execute_spotify_with_token_retry(search_albums, q)
             return Response(search_result)
+        except SpotifyResponseException as e:
+            return Response(e.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -33,8 +36,10 @@ class SpotifySearchView(APIView):
 class SpotifyAlbumView(APIView):
     def get(self, request, id):
         try:
-            album = execute_with_token_retry(get_album, id)
+            album = execute_spotify_with_token_retry(get_album, id)
             return Response(album)
+        except SpotifyResponseException as e:
+            return Response(e.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

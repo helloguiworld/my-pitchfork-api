@@ -28,7 +28,7 @@ class SpotifySearchView(APIView):
             search_result = execute_spotify_with_token_retry(search_albums, q)
             return Response(search_result)
         except SpotifyResponseException as e:
-            return Response(e.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(e.data, status=e.response.status_code)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -39,7 +39,7 @@ class SpotifyAlbumView(APIView):
             album = execute_spotify_with_token_retry(get_album, id)
             return Response(album)
         except SpotifyResponseException as e:
-            return Response(e.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(e.data, status=e.response.status_code)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

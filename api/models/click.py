@@ -15,4 +15,4 @@ class AlbumClick(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.q} - {self.creation_date}"
+        return f"{self.album_name} - {self.creation_date}"

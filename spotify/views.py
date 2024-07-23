@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .services.token import get_spotify_token, execute_spotify_with_token_retry
 from .services.search import search_albums
-from .services.albums import get_album
+from .services.album import get_album
 from .services.client import get_client_ip
 from .exceptions import SpotifyResponseException
 

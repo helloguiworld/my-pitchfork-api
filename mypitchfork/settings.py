@@ -17,6 +17,9 @@ from pathlib import Path
 import os
 import dj_database_url
 
+from django.core.cache import cache
+cache.clear()
+
 load_dotenv()
 setup_spotify_token()
 

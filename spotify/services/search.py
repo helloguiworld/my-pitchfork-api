@@ -1,6 +1,5 @@
 import requests
 from django.utils import timezone
-from datetime import timedelta
 from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 from ..services import get_spotify_token
 from ..serializers import SearchSerializer, AlbumSerializer
@@ -16,8 +15,17 @@ def get_current_search_interval():
     current_interval = now.replace(minute=minutes, second=30, microsecond=0)
     return current_interval
 
+def get_current_search_hour_interval():
+    now = timezone.now()
+    # print('----now        :     ', now)
+    if now.minute <= 1 and now.second < 30:
+        current_interval = (now - timezone.timedelta(hours=1)).replace(minute=1, second=30, microsecond=0)
+    else:
+        current_interval = now.replace(minute=1, second=30, microsecond=0)
+    return current_interval
+
 def is_in_valid_search_interval(last_update):
-    current_interval = get_current_search_interval()
+    current_interval = get_current_search_hour_interval()
     print('----last update:     ', last_update)
     print('----current interval:', current_interval)
     return current_interval < last_update

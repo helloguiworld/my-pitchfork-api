@@ -6,7 +6,7 @@ from . import get_spotify_token
 from ..models import Album
 from ..serializers import AlbumSerializer
 
-MAX_ALBUM_STORAGE_TIME = timedelta(minutes=15)
+MAX_ALBUM_STORAGE_TIME = timedelta(minutes=30)
 
 def clean_album(album):
     return {

@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
 
 class Share(models.Model):
     TYPE_CHOICES = [
@@ -13,8 +14,8 @@ class Share(models.Model):
         max_digits=3,
         decimal_places=1,
         validators=[
-            MinValueValidator(0),
-            MaxValueValidator(10)
+            MinValueValidator(Decimal('0.0')),
+            MaxValueValidator(Decimal('10.0'))
         ],
         null=True,
         default=None

@@ -7,25 +7,26 @@ from ..models import Album, Search
 from .album import get_albums, save_album
 
 # MAX_SEARCH_STORAGE_TIME = timedelta(minutes=5)
-SEARCH_MINUTES_INTERVAL = 30
+SEARCH_HOURS_INTERVAL = 3
 
-def get_current_search_interval():
-    now = timezone.now()
-    minutes = (now.minute // SEARCH_MINUTES_INTERVAL) * SEARCH_MINUTES_INTERVAL + 1
-    current_interval = now.replace(minute=minutes, second=30, microsecond=0)
-    return current_interval
-
-def get_current_search_hour_interval():
+def get_current_search_hours_interval():
     now = timezone.now()
     # print('----now        :     ', now)
-    if now.minute <= 1 and now.second < 30:
-        current_interval = (now - timezone.timedelta(hours=1)).replace(minute=1, second=30, microsecond=0)
-    else:
-        current_interval = now.replace(minute=1, second=30, microsecond=0)
+    hour = (now.hour // SEARCH_HOURS_INTERVAL) * SEARCH_HOURS_INTERVAL
+    current_interval = now.replace(hour=hour, minute=1, second=0, microsecond=0)
     return current_interval
 
+# def get_current_search_hour_interval():
+#     now = timezone.now()
+#     # print('----now        :     ', now)
+#     if now.minute <= 1 and now.second < 30:
+#         current_interval = (now - timezone.timedelta(hours=1)).replace(minute=1, second=30, microsecond=0)
+#     else:
+#         current_interval = now.replace(minute=1, second=30, microsecond=0)
+#     return current_interval
+
 def is_in_valid_search_interval(last_update):
-    current_interval = get_current_search_hour_interval()
+    current_interval = get_current_search_hours_interval()
     print('----last update:     ', last_update)
     print('----current interval:', current_interval)
     return current_interval < last_update

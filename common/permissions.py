@@ -4,4 +4,7 @@ class IsAdminOrMyOrigin(BasePermission):
     def has_permission(self, request, view):
         # if request.method in SAFE_METHODS:
         #     return True
-        return (request.user and request.user.is_staff) or request.META.get('HTTP_ORIGIN') == 'https://mypitchfork.fun'
+        return (
+            (request.user and request.user.is_authenticated and request.user.is_staff) or
+            request.META.get('HTTP_ORIGIN') == 'https://mypitchfork.fun'
+        )

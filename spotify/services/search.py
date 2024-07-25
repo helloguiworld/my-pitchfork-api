@@ -7,7 +7,7 @@ from ..models import Album, Search
 from .album import get_albums, save_album
 
 # MAX_SEARCH_STORAGE_TIME = timedelta(minutes=5)
-SEARCH_HOURS_INTERVAL = 3
+SEARCH_HOURS_INTERVAL = 6
 
 def get_current_search_hours_interval():
     now = timezone.now()

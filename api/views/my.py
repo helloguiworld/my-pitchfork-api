@@ -1,18 +1,29 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from ..serializers import AccountSerializer, ReviewSerializer
+from rest_framework.response import Response
+from ..serializers import AccountSerializer, ReviewSummarySerializer
 from ..models import Account, Review
+from ..permissions import HasAccount, IsAccountOwner
 
-class MyAccountView(viewsets.ReadOnlyModelViewSet):
-    serializer_class = AccountSerializer
-    permission_classes = [IsAuthenticated]
+class MyAccountView(viewsets.ViewSet):
+    permission_classes = [HasAccount]
+    
+    def list(self, request):
+        user = request.user
+        account = Account.objects.filter(user=user).first()
+        account_serializer = AccountSerializer(account)
+        return Response(account_serializer.data)
+
+class MyReviewsView(viewsets.ModelViewSet):
+    lookup_field = 'album'
+    serializer_class = ReviewSummarySerializer
+    permission_classes = [IsAccountOwner]
 
     def get_queryset(self):
-        return Account.objects.filter(user=self.request.user)
+        account = self.request.user.account
+        return Review.objects.filter(account=account)
 
-class MyReviewsView(viewsets.ReadOnlyModelViewSet):
-    serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Review.objects.filter(account=self.request.user.account)
+    def perform_create(self, serializer):
+        account = self.request.user.account
+        serializer.save(account=account)
+        

@@ -9,6 +9,12 @@ class TrackScoreSerializer(serializers.ModelSerializer):
             'account': {'read_only': True},
             'review': {'read_only': True},
         }
+        
+class TrackScoreSummarySerializer(TrackScoreSerializer):
+    class Meta:
+        model = TrackScore
+        fields = ['track', 'score']
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     track_scores = TrackScoreSerializer(many=True)
@@ -42,3 +48,10 @@ class ReviewSerializer(serializers.ModelSerializer):
                     'review': review
                 }
             )
+
+class ReviewSummarySerializer(ReviewSerializer):
+    track_scores = TrackScoreSummarySerializer(many=True)
+    
+    class Meta:
+        model = Review
+        fields = ['album', 'score', 'track_scores']

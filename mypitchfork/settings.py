@@ -61,11 +61,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-}
-if os.environ.get('PRODUCTION'):
-    REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES'] = (
-        'common.permissions.IsAdminOrMyOrigin',
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
     )
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

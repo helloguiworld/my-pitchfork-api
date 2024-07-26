@@ -1,2 +1,2 @@
 from .dynamic_fields_model_serializer import DynamicFieldsModelSerializer
-from .permissions import IsAdminOrMyOrigin
+from .permissions import IsSafe, IsMyOrigin, IsAdminOrPostOnly

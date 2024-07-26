@@ -1,13 +1,24 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from ..models import SearchClick, AlbumClick
-from ..serializers import SearchClickSerializer, AlbumClickSerializer
+from django.db.models import Count, Avg
+from common import IsAdminOrPostOnly
+from ..models import SearchClick, AlbumClick, ShareClick
+from ..serializers import SearchClickSerializer, AlbumClickSerializer, ShareClickSerializer
 from unidecode import unidecode
+
+# def ranking(queryset, value_fields, count_field='count'):
+#     values = queryset.values_list(*value_fields)
+    
+#     frequency = {}
+#     for value in values:
+#         normalized_value = unidecode(value).lower()
+#         frequency[normalized_value] = frequency.get(normalized_value, 0) + 1
 
 class SearchClickViewSet(viewsets.ModelViewSet):
     queryset = SearchClick.objects.all()
     serializer_class = SearchClickSerializer
+    permission_classes = [IsAdminOrPostOnly]
     
     @action(detail=False, methods=['get'])
     def ranking(self, request):
@@ -25,24 +36,34 @@ class SearchClickViewSet(viewsets.ModelViewSet):
 class AlbumClickViewSet(viewsets.ModelViewSet):
     queryset = AlbumClick.objects.all()
     serializer_class = AlbumClickSerializer
+    permission_classes = [IsAdminOrPostOnly]
     
     @action(detail=False, methods=['get'])
     def ranking(self, request):
-        album_clicks = AlbumClick.objects.values_list('album_id', 'album_name')
-        
-        frequency = {}
-        for album_click in album_clicks:
-            album_id, album_name = album_click
-            
-            if album_id in frequency:
-                frequency[album_id]['count'] += 1
-            else:
-                frequency[album_id] = {'count': 1, 'album_name': album_name}
-            
-        sorted_frequency = sorted(frequency.items(), key=lambda item: item[1]['count'], reverse=True)
-        
-        return Response([{
-            'album_id': album_id,
-            'album_name': info['album_name'],
-            'count': info['count']
-        } for album_id, info in sorted_frequency])
+        album_clicks_groups = (
+            AlbumClick.objects
+                .values('album_id', 'album_name')
+                .annotate(
+                    count=Count('album_id'),
+                )
+                .order_by('-count')
+        )
+        return Response(album_clicks_groups)
+
+class ShareClickViewSet(viewsets.ModelViewSet):
+    queryset = ShareClick.objects.all()
+    serializer_class = ShareClickSerializer
+    permission_classes = [IsAdminOrPostOnly]
+
+    @action(detail=False, methods=['get'])
+    def ranking(self, request):
+        share_clicks_groups = (
+            ShareClick.objects
+                .values('album_id', 'album_name')
+                .annotate(
+                    count=Count('album_id'),
+                    average_review_scores=Avg('review_score')
+                )
+                .order_by('-count')
+        )
+        return Response(share_clicks_groups)

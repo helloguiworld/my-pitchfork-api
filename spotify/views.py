@@ -6,12 +6,9 @@ from .services.search import search_albums
 from .services.album import get_album
 from .services.client import get_client_ip
 from .exceptions import SpotifyResponseException
+from common.permissions import IsSafe, IsMyOrigin
 
-from rest_framework.permissions import IsAdminUser
-
-class SpotifyTokenView(APIView):
-    permission_classes = [IsAdminUser]
-
+class SpotifyTokenView(APIView):    
     def get(self, request):
         try:
             access_token = get_spotify_token()
@@ -21,6 +18,8 @@ class SpotifyTokenView(APIView):
 
 
 class SpotifySearchView(APIView):
+    permission_classes = [IsSafe, IsMyOrigin]
+    
     def get(self, request):
         q = request.query_params.get('q', '')
 
@@ -34,6 +33,8 @@ class SpotifySearchView(APIView):
 
 
 class SpotifyAlbumView(APIView):
+    permission_classes = [IsSafe, IsMyOrigin]
+    
     def get(self, request, id):
         try:
             album = execute_spotify_with_token_retry(get_album, id)

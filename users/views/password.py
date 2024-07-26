@@ -55,7 +55,6 @@ class PasswordResetRequestView(APIView):
             print(f"ERROR: {e}")
             return Response({"error": "Failed to send password reset email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class PasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
 

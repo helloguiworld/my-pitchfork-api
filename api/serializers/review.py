@@ -2,6 +2,12 @@ from rest_framework import serializers
 from ..models import Review, TrackScore
 
 class TrackScoreSerializer(serializers.ModelSerializer):
+    score = serializers.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        coerce_to_string=False
+    )
+    
     class Meta:
         model = TrackScore
         fields = '__all__'
@@ -18,6 +24,11 @@ class TrackScoreSummarySerializer(TrackScoreSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     track_scores = TrackScoreSerializer(many=True)
+    score = serializers.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        coerce_to_string=False
+    )
 
     class Meta:
         model = Review

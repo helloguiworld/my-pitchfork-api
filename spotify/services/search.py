@@ -56,7 +56,7 @@ def search_albums(q):
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
-    search_url = f'https://api.spotify.com/v1/search?q={q}&type=album&limit=20'
+    search_url = f'https://api.spotify.com/v1/search?q={q}&type=album&limit=10'
     response = requests.get(search_url, headers=headers)
     
     if response.status_code == 200:

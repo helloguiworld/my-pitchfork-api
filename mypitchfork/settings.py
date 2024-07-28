@@ -78,7 +78,7 @@ MIDDLEWARE = [
 ]
 
 if os.environ.get('PRODUCTION'):
-    CORS_ALLOW_METHODS = ['GET']
+    # CORS_ALLOW_METHODS = ['GET']
     CORS_ALLOWED_ORIGINS = [
         "https://mypitchfork.fun",
         "https://api.mypitchfork.fun",

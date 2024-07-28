@@ -7,7 +7,7 @@ from ..models import Album, Search
 from .album import get_albums, save_album
 
 # MAX_SEARCH_STORAGE_TIME = timedelta(minutes=5)
-SEARCH_HOURS_INTERVAL = 6
+SEARCH_HOURS_INTERVAL = 8
 
 def get_current_search_hours_interval():
     now = timezone.now()
@@ -56,7 +56,7 @@ def search_albums(q):
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
-    search_url = f'https://api.spotify.com/v1/search?q={q}&type=album&limit=10'
+    search_url = f'https://api.spotify.com/v1/search?q={q}&type=album&limit=20'
     response = requests.get(search_url, headers=headers)
     
     if response.status_code == 200:

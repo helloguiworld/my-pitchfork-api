@@ -65,4 +65,4 @@ class ReviewSummarySerializer(ReviewSerializer):
     
     class Meta:
         model = Review
-        fields = ['album', 'score', 'track_scores']
+        fields = ['album', 'score', 'is_best_new', 'track_scores']

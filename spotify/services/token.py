@@ -53,7 +53,6 @@ def setup_spotify_token():
         access_token = token_infos['access_token']
         os.environ['SPOTIFY_ACCESS_TOKEN'] = access_token
         
-        print("Spotify access token obtained and saved.")
         return access_token
     except Exception as e:
         print(f"Error obtaining Spotify token: {e}")

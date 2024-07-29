@@ -17,3 +17,6 @@ staticfiles/
 
 # nohup
 nohup.out
+
+# dump
+dump*

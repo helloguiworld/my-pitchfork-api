@@ -79,4 +79,26 @@ def search_albums(q):
         raise InvalidSpotifyToken
     else:
         raise SpotifyResponseException(response)
-    
+
+def old_searches(days=1, detailed=False, clean=False):
+        now = timezone.now()
+        limit_date = now - timezone.timedelta(days=days)
+        searches_to_delete = Search.objects.filter(updated_at__lte=limit_date)
+
+        count = searches_to_delete.count()
+        response_data = {
+            'days': days,
+            'now': now,
+            'limit': limit_date,
+            'count': count
+        }
+
+        if detailed:
+            s_s = SearchSerializer(searches_to_delete, many=True)
+            response_data['searches'] = [s['q'] for s in s_s.data]
+
+        if clean:
+            deleted_count, _ = searches_to_delete.delete()
+            response_data['deleted_count'] = deleted_count
+
+        return response_data

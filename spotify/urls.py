@@ -1,12 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import  SpotifyTokenView, SpotifySearchView, SpotifyAlbumView, ClientIpView
-from .views import OldSearchsViewSet, OldAlbumsViewSet
+from .views import OldSearchesViewSet, OldAlbumsViewSet
 
 router = DefaultRouter()
 # router.register(r'token', SpotifyTokenView, basename='spotify-token')
 # router.register(r'search', SpotifySearchView, basename='spotify-search')
-router.register(r'old-searchs', OldSearchsViewSet, basename='old-searchs')
+router.register(r'old-searches', OldSearchesViewSet, basename='old-searches')
 router.register(r'old-albums', OldAlbumsViewSet, basename='old-albums')
 
 urlpatterns = [

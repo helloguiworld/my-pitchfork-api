@@ -92,4 +92,27 @@ def get_albums(ids):
         raise InvalidSpotifyToken
     else:
         raise SpotifyResponseException(response)
+
+def old_albums(days=1, detailed=False, clean=False):
+        now = timezone.now()
+        limit_date = now - timezone.timedelta(days=days)
+        albums_to_delete = Album.objects.filter(updated_at__lte=limit_date)
+
+        count = albums_to_delete.count()
+        response_data = {
+            'days': days,
+            'now': now,
+            'limit': limit_date,
+            'count': count
+        }
+
+        if detailed:
+            a_s = AlbumSerializer(albums_to_delete, many=True)
+            response_data['albums'] = [a['name'] for a in a_s.data]
+
+        if clean:
+            deleted_count, _ = albums_to_delete.delete()
+            response_data['deleted_count'] = deleted_count
+    
+        return response_data
     

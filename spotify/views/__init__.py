@@ -2,8 +2,8 @@ from rest_framework import views, viewsets,status, serializers
 from rest_framework.response import Response
 from django.utils import timezone
 from ..services.token import get_spotify_token, execute_spotify_with_token_retry
-from ..services.search import search_albums
-from ..services.album import get_album
+from ..services.search import search_albums, old_searches
+from ..services.album import get_album, old_albums
 from ..services.client import get_client_ip
 from ..exceptions import SpotifyResponseException
 from common.permissions import IsSafe, IsMyOrigin
@@ -64,52 +64,29 @@ class ClientIpView(views.APIView):
 class OldConsultSerializer(serializers.Serializer):
     days = serializers.IntegerField(required=False, default=1)
     detailed = serializers.BooleanField(required=False, default=False)
+    clean = serializers.BooleanField(required=False, default=False)
     
-class OldSearchsViewSet(viewsets.ViewSet):
+class OldSearchesViewSet(viewsets.ViewSet):
     def create(self, request, *args, **kwargs):
-        # Recebe o número de dias da requisição POST
         serializer = OldConsultSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         days = serializer.validated_data['days']
         detailed = serializer.validated_data['detailed']
+        clean = serializer.validated_data['clean']
 
-        # Calcula a data limite
-        now = timezone.now()
-        limit_date = now - timezone.timedelta(days=days)
+        response_data = old_searches(days, detailed, clean)
 
-        # # Apaga os registros mais antigos que a data limite
-        # deleted_count, _ = Search.objects.filter(updated_at__lte=limit_date).delete()
-        deleted_count = Search.objects.filter(updated_at__lte=limit_date)
-        count = deleted_count.count()
+        return Response(response_data)
 
-        if detailed:
-            s_s = SearchSerializer(deleted_count, many=True)
-            return Response({'days': days, 'now': now, 'limit': limit_date, 'count': count, 'deleted': [s['q'] for s in s_s.data]})
-        else:
-            return Response({'days': days, 'now': now, 'limit': limit_date, 'count': count})
-        # return Response({'message': f'{limit_date} searches deleted'})
 
 class OldAlbumsViewSet(viewsets.ViewSet):
     def create(self, request, *args, **kwargs):
-        # Recebe o número de dias da requisição POST
         serializer = OldConsultSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         days = serializer.validated_data['days']
         detailed = serializer.validated_data['detailed']
+        clean = serializer.validated_data['clean']
 
-        # Calcula a data limite
-        now = timezone.now()
-        limit_date = now - timezone.timedelta(days=days)
+        response_data = old_albums(days, detailed, clean)
 
-        # # Apaga os registros mais antigos que a data limite
-        # deleted_count, _ = Search.objects.filter(updated_at__lte=limit_date).delete()
-        deleted_count = Album.objects.filter(updated_at__lte=limit_date)
-        count = deleted_count.count()
-
-        if detailed:
-            a_s = AlbumSerializer(deleted_count, many=True)
-            return Response({'days': days, 'now': now, 'limit': limit_date, 'count': count, 'deleted': [a['name'] for a in a_s.data]})
-        else:
-            return Response({'days': days, 'now': now, 'limit': limit_date, 'count': count})
-        # return Response({'message': f'{limit_date} searches deleted'})
-            
+        return Response(response_data)

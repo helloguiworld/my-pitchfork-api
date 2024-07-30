@@ -30,7 +30,7 @@ class SearchSummarySerializer(serializers.ModelSerializer):
             album_data = album_obj['data']
             
             album_data['total_tracks'] = len(album_data['tracks'])
-            # del album_data['tracks']
+            del album_data['tracks']
             
             albums.append(album_data)
             

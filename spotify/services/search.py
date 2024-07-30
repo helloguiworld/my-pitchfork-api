@@ -2,7 +2,7 @@ import requests
 from django.utils import timezone
 from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 from ..services import get_spotify_token
-from ..serializers import SearchSerializer, AlbumSerializer
+from ..serializers import SearchSerializer, SearchSummarySerializer
 from ..models import Album, Search
 from .album import get_albums, save_album
 
@@ -42,7 +42,7 @@ def search_albums(q):
         search = Search.objects.get(q=q)
         if is_in_valid_search_interval(search.updated_at):
             print(f'GOT STORED SEARCH {q}')
-            search_serializer = SearchSerializer(search)
+            search_serializer = SearchSummarySerializer(search)
             return search_serializer.data['albums']
     except Search.DoesNotExist:
         print(f'NEW SEARCH {q}')
@@ -69,11 +69,11 @@ def search_albums(q):
         for album in albums_datas:
             saved_album = save_album(album)
             saved_albums.append(saved_album)
-            
+
         saved_search = save_search(q, saved_albums)
         print(f'SAVED SEARCH {q}')
         
-        search_serializer = SearchSerializer(saved_search)
+        search_serializer = SearchSummarySerializer(saved_search)
         return search_serializer.data['albums']
     elif response.status_code == 401:
         raise InvalidSpotifyToken

@@ -1,2 +1,2 @@
 from .album import AlbumSerializer
-from .search import SearchSerializer
+from .search import SearchSerializer, SearchSummarySerializer

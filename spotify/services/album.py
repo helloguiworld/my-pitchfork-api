@@ -96,7 +96,7 @@ def get_albums(ids):
 
 def old_albums(days=1, detailed=False, clean=False):
         now = timezone.now()
-        limit_date = now - timezone.timedelta(minutes=days)
+        limit_date = now - timezone.timedelta(days=days)
         albums_to_delete = (Album.objects
             .annotate(reviews_count=Count('reviews'))
             .filter(updated_at__lte=limit_date, reviews_count__exact=0)

@@ -1,2 +1,2 @@
-from .albums import Album
+from .albums import Album, Track
 from .search import Search

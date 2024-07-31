@@ -1,1 +1,1 @@
-from .account import HasAccount, IsAccountOwner, IsAdminOrAccountOwner
+from .account import HasAccount, IsAccountOwner

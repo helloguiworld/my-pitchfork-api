@@ -13,10 +13,10 @@ from django.core.mail import send_mail
 
 from ..serializers import CustomUserSerializer as UserSerializer
 from users.models import CustomUser as User
-from common.permissions import IsMyOrigin
+from common.permissions import IsMyOriginOrAdmin
 
 class PasswordResetRequestView(APIView):
-    permission_classes = [IsMyOrigin]
+    permission_classes = [IsMyOriginOrAdmin]
     
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
@@ -63,7 +63,7 @@ class PasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
 
 class PasswordResetView(APIView):
-    permission_classes = [IsMyOrigin]
+    permission_classes = [IsMyOriginOrAdmin]
     
     def post(self, request, u_id_b64, token):
         try:

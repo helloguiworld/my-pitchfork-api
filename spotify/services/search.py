@@ -32,7 +32,7 @@ def is_in_valid_search_interval(last_update):
     return current_interval < last_update
 
 def save_search(q, albums):
-    search, created = Search.objects.update_or_create(q=q,)
+    search, _ = Search.objects.update_or_create(q=q)
     search.albums.set(albums)
     search.save()
     return search
@@ -42,8 +42,8 @@ def search_albums(q):
         search = Search.objects.get(q=q)
         if is_in_valid_search_interval(search.updated_at):
             print(f'GOT STORED SEARCH {q}')
-            search_serializer = SearchSummarySerializer(search)
-            return search_serializer.data['albums']
+            s_s = SearchSummarySerializer(search)
+            return s_s.data['albums']
     except Search.DoesNotExist:
         print(f'NEW SEARCH {q}')
         pass
@@ -73,8 +73,8 @@ def search_albums(q):
         saved_search = save_search(q, saved_albums)
         print(f'SAVED SEARCH {q}')
         
-        search_serializer = SearchSummarySerializer(saved_search)
-        return search_serializer.data['albums']
+        s_s = SearchSummarySerializer(saved_search)
+        return s_s.data['albums']
     elif response.status_code == 401:
         raise InvalidSpotifyToken
     else:

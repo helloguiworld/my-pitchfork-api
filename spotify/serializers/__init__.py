@@ -1,2 +1,6 @@
-from .album import AlbumSerializer
+from .album import (
+    TrackSerializer,
+    AlbumSerializer,
+    AlbumWithTracksSerializer,
+)
 from .search import SearchSerializer, SearchSummarySerializer

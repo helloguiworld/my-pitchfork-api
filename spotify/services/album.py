@@ -4,8 +4,8 @@ from django.db.models import Count
 from datetime import timedelta
 from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 from . import get_spotify_token
-from ..models import Album
-from ..serializers import AlbumSerializer
+from ..models import Album, Track
+from ..serializers import AlbumWithTracksSerializer
 
 MAX_ALBUM_STORAGE_TIME = timedelta(hours=12)
 
@@ -23,20 +23,33 @@ def clean_album(album):
             'artists': [artist['name'] for artist in track['artists']],
             'number': index+1,
         } for index, track in enumerate(album['tracks']['items'])],
+        'tracks_count': album['total_tracks'],
+        'total_tracks': album['total_tracks'],
     }
 
-
-def save_album(album):
-    saved_album, created = Album.objects.update_or_create(
+def save_album(album_data):
+    album = clean_album(album_data)
+    tracks = album.pop('tracks')
+    
+    saved_album, _ = Album.objects.update_or_create(
         id=album['id'],
         defaults={
             'id': album['id'],
-            'name': album['name'],
-            'data': clean_album(album),
+            'data': album,
         }
     )
+    
+    for track in tracks:
+        Track.objects.update_or_create(
+            id=track['id'],
+            defaults={
+                'id': track['id'],
+                'album': saved_album,
+                'data': track,
+            }
+        )
+    
     return saved_album
-
 
 def get_album(id):
     try:
@@ -45,7 +58,7 @@ def get_album(id):
         print('----time now:   ', timezone.now())
         if timezone.now() - album.updated_at < MAX_ALBUM_STORAGE_TIME:
             print(f'GOT STORED ALBUM {album}')
-            album_serializer = AlbumSerializer(album)
+            album_serializer = AlbumWithTracksSerializer(album)
             return album_serializer.data['data']
     except Album.DoesNotExist:
         print(f'NEW ALBUM {id}')
@@ -66,13 +79,12 @@ def get_album(id):
         album_result = response.json()
         saved_album = save_album(album_result)
         print('SAVED ALBUM')
-        album_serializer = AlbumSerializer(saved_album)
+        album_serializer = AlbumWithTracksSerializer(saved_album)
         return album_serializer.data['data']
     elif response.status_code == 401:
         raise InvalidSpotifyToken
     else:
         raise SpotifyResponseException(response)
-
 
 def get_albums(ids):
     try:

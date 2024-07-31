@@ -1,12 +1,12 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from common.permissions import IsSafe, IsMyOrigin
+from common.permissions import IsSafe, IsMyOriginOrAdmin
 from ..services.token import execute_spotify_with_token_retry
 from ..services.album import get_album
 from ..exceptions import SpotifyResponseException
 
 class SpotifyAlbumView(viewsets.ViewSet):
-    permission_classes = [IsSafe, IsMyOrigin]
+    permission_classes = [IsSafe, IsMyOriginOrAdmin]
     
     def retrieve(self, request, pk=None):
         try:

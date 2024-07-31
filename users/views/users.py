@@ -6,7 +6,7 @@ from ..serializers import CustomUserSerializer as UserSerializer
 
 class AuthenticatedUserView(APIView):
     def get(self, request):
-        if request.user and request.user.is_authenticated:
+        if request.user.is_authenticated:
             userSerializer = UserSerializer(request.user)
             return Response(userSerializer.data)
         raise NotAuthenticated()

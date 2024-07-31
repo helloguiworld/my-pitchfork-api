@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from common.permissions import IsSafe, IsMyOrigin
+from common.permissions import IsSafe, IsMyOriginOrAdmin
 from ..services.token import execute_spotify_with_token_retry
 from ..services.search import search_albums
 from ..exceptions import SpotifyResponseException
@@ -19,7 +19,7 @@ def _search_albums(q=None):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SpotifySearchView(viewsets.ViewSet):
-    permission_classes = [IsSafe, IsMyOrigin]
+    permission_classes = [IsSafe, IsMyOriginOrAdmin]
     
     def list(self, request):
         q = request.query_params.get('q', '')

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from ..models import Review, TrackScore
+from spotify.serializers import AlbumSerializer
 
 class TrackScoreSerializer(serializers.ModelSerializer):
     score = serializers.DecimalField(
@@ -54,8 +55,10 @@ class ReviewSerializer(serializers.ModelSerializer):
                 account=review.account,
                 track=track_score_data['track'],
                 defaults={
+                    'account': review.account,
+                    'track': track_score_data['track'],
+                    'review': review,
                     'score': track_score_data['score'],
-                    'review': review
                 }
             )
 
@@ -65,3 +68,18 @@ class ReviewSummarySerializer(ReviewSerializer):
     class Meta:
         model = Review
         fields = ['album', 'score', 'is_best_new', 'track_scores']
+
+# ---------------------------------------------------------------------
+        
+class ReviewWithAlbumSerializer(ReviewSerializer):
+    album = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Review
+        fields = ['album', 'score', 'is_best_new']
+    
+    def get_album(self, obj):
+        return obj.album.data
+
+class ReviewWithAlbumAndTrackScoresSerializer(ReviewSummarySerializer, ReviewWithAlbumSerializer):
+    pass

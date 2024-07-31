@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from ..models import Account
-from spotify.models import Album
+from spotify.models import Album, Track
 
 class Review(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -17,6 +17,7 @@ class Review(models.Model):
         ],
     )
     is_best_new = models.BooleanField(default=False)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
         
@@ -30,9 +31,9 @@ class Review(models.Model):
 
 class TrackScore(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    track = models.ForeignKey(Track, related_name='scores', on_delete=models.PROTECT)
     review = models.ForeignKey(Review, related_name='track_scores', on_delete=models.CASCADE)
     
-    track = models.CharField(max_length=50)
     score = models.DecimalField(
         max_digits=3,
         decimal_places=1,

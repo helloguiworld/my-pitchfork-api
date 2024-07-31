@@ -1,7 +1,6 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from ..serializers import AccountSerializer, ReviewSummarySerializer
+from ..serializers import AccountSerializer, ReviewSummarySerializer, ReviewWithAlbumSerializer
 from ..models import Account, Review
 from ..permissions import HasAccount, IsAccountOwner
 
@@ -32,13 +31,19 @@ class MyProfileView(viewsets.ViewSet):
 
     def list(self, request):
         account = request.user.account
+        response = {}
         reviews = Review.objects.filter(account=account)
-        serializer = ReviewSummarySerializer(reviews, many=True)
         
-        # for review_data in serializer.data:
+        # REVIEWS CONT
+        response['reviews_count'] = reviews.count()
+        
+        # TOP 10 REVIEWS
+        top10 = reviews.order_by('-score', '-created_at')[:10]
+        t10_s = ReviewWithAlbumSerializer(top10, many=True)
+        top10 = t10_s.data
+        response['top10'] = top10
             
-        
-        return Response(serializer.data)
+        return Response(response)
 
 
         

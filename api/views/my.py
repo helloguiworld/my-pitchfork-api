@@ -11,8 +11,8 @@ class MyAccountView(viewsets.ViewSet):
     def list(self, request):
         user = request.user
         account = Account.objects.filter(user=user).first()
-        account_serializer = AccountSerializer(account)
-        return Response(account_serializer.data)
+        serializer = AccountSerializer(account)
+        return Response(serializer.data)
 
 class MyReviewsView(viewsets.ModelViewSet):
     lookup_field = 'album'
@@ -26,4 +26,19 @@ class MyReviewsView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         account = self.request.user.account
         serializer.save(account=account)
+
+class MyProfileView(viewsets.ViewSet):
+    permission_classes = [HasAccount]
+
+    def list(self, request):
+        account = request.user.account
+        reviews = Review.objects.filter(account=account)
+        serializer = ReviewSummarySerializer(reviews, many=True)
+        
+        # for review_data in serializer.data:
+            
+        
+        return Response(serializer.data)
+
+
         

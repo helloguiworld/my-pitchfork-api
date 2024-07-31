@@ -21,7 +21,6 @@ class TrackScoreSummarySerializer(TrackScoreSerializer):
         model = TrackScore
         fields = ['track', 'score']
 
-
 class ReviewSerializer(serializers.ModelSerializer):
     track_scores = TrackScoreSerializer(many=True)
     score = serializers.DecimalField(

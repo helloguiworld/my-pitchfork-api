@@ -2,10 +2,12 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from ..models import Account
+from spotify.models import Album
 
 class Review(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    album = models.CharField(max_length=50)
+    album = models.ForeignKey(Album, related_name='reviews', on_delete=models.PROTECT)
+    
     score = models.DecimalField(
         max_digits=3,
         decimal_places=1,
@@ -17,21 +19,19 @@ class Review(models.Model):
     is_best_new = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    @property
-    def track_scores(self):
-        return TrackScore.objects.filter(review=self)
+        
+    def __str__(self):
+        return f"{self.account.user.username} - {self.album} - {self.score}"
     
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['account', 'album'], name='unique_account_album')
         ]
-        
-    def __str__(self):
-        return f"{self.account.user.username} - {self.album} - {self.score}"
 
 class TrackScore(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, related_name='track_scores', on_delete=models.CASCADE)
+    
     track = models.CharField(max_length=50)
     score = models.DecimalField(
         max_digits=3,
@@ -41,7 +41,6 @@ class TrackScore(models.Model):
             MaxValueValidator(Decimal('10.0'))
         ],
     )
-    review = models.ForeignKey(Review, on_delete=models.CASCADE)
     
     class Meta:
         constraints = [

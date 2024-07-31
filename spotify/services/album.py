@@ -1,5 +1,6 @@
 import requests
 from django.utils import timezone
+from django.db.models import Count
 from datetime import timedelta
 from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 from . import get_spotify_token
@@ -95,20 +96,22 @@ def get_albums(ids):
 
 def old_albums(days=1, detailed=False, clean=False):
         now = timezone.now()
-        limit_date = now - timezone.timedelta(days=days)
-        albums_to_delete = Album.objects.filter(updated_at__lte=limit_date)
+        limit_date = now - timezone.timedelta(minutes=days)
+        albums_to_delete = (Album.objects
+            .annotate(reviews_count=Count('reviews'))
+            .filter(updated_at__lte=limit_date, reviews_count__exact=0)
+        )
 
         count = albums_to_delete.count()
         response_data = {
             'days': days,
             'now': now,
             'limit': limit_date,
-            'count': count
+            'count': count,
         }
 
         if detailed:
-            a_s = AlbumSerializer(albums_to_delete, many=True)
-            response_data['albums'] = [a['name'] for a in a_s.data]
+            response_data['albums'] = [a.name for a in albums_to_delete]
 
         if clean:
             deleted_count, _ = albums_to_delete.delete()

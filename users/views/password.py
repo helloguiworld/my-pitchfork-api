@@ -2,6 +2,7 @@ import os
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 from rest_framework import status, serializers
 
 from django.contrib.auth.tokens import default_token_generator
@@ -12,8 +13,11 @@ from django.core.mail import send_mail
 
 from ..serializers import CustomUserSerializer as UserSerializer
 from users.models import CustomUser as User
+from common.permissions import IsMyOrigin
 
 class PasswordResetRequestView(APIView):
+    permission_classes = [IsMyOrigin]
+    
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         if not email:
@@ -59,6 +63,8 @@ class PasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
 
 class PasswordResetView(APIView):
+    permission_classes = [IsMyOrigin]
+    
     def post(self, request, u_id_b64, token):
         try:
             u_id = urlsafe_base64_decode(u_id_b64).decode()
@@ -72,6 +78,7 @@ class PasswordResetView(APIView):
                 new_password = serializer.validated_data['new_password']
                 user.set_password(new_password)
                 user.save()
+                Token.objects.filter(user=user).delete()
                 if os.environ.get('PRODUCTION'):
                     return Response({"success": "Password has been reset"})
                 else:

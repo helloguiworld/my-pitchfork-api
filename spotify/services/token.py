@@ -1,6 +1,6 @@
 import os
 import requests
-from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
+from ..exceptions import InvalidSpotifyToken
 
 def get_spotify_token_infos():
     token_url = "https://accounts.spotify.com/api/token"

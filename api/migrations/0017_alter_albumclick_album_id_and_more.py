@@ -17,16 +17,6 @@ class Migration(migrations.Migration):
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name='albumclick',
-            name='album_name',
-            field=models.CharField(max_length=100),
-        ),
-        migrations.AlterField(
-            model_name='searchclick',
-            name='q',
-            field=models.CharField(max_length=100),
-        ),
-        migrations.AlterField(
             model_name='trackscore',
             name='track',
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='scores', to='api.review'),

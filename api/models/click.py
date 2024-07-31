@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 
 class SearchClick(models.Model):
-    q = models.CharField(max_length=100)
+    q = models.CharField(max_length=50)
     
     creation_date = models.DateTimeField(auto_now_add=True)
     
@@ -11,8 +11,8 @@ class SearchClick(models.Model):
         return f"{self.q} - {self.creation_date}"
 
 class AlbumClick(models.Model):
-    album_id = models.CharField(max_length=50)
-    album_name = models.CharField(max_length=100)
+    album_id = models.CharField(max_length=255)
+    album_name = models.CharField(max_length=255)
     
     creation_date = models.DateTimeField(auto_now_add=True)
     
@@ -37,7 +37,6 @@ class ShareClick(models.Model):
         null=True,
     )
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
-    
     creation_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

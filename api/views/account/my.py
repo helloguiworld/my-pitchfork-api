@@ -65,7 +65,7 @@ class MyProfileView(viewsets.ViewSet):
         new_releases = (
             reviews
                 .filter(album__data__date__gte=one_month_ago_str)
-                .order_by('-album__data__date', '-score')[:10]
+                .order_by('-album__data__date', '-score', '-is_best_new')[:10]
         )
         nr_s = ReviewWithAlbumSerializer(new_releases, many=True)
         new_releases = nr_s.data

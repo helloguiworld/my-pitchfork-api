@@ -59,10 +59,14 @@ class MyProfileView(viewsets.ViewSet):
         reviews = Review.objects.filter(account=account).order_by('-created_at')
         response['reviews_count'] = reviews.count()
         
-        # NEW RELEASES (1 month = 4 weeks)
+        # NEW RELEASES (1 month = 4 weeks, max 10)
         one_month_ago = timezone.now() - timezone.timedelta(weeks=4)
         one_month_ago_str = one_month_ago.date().isoformat()
-        new_releases = reviews.filter(album__data__date__gte=one_month_ago_str).order_by('-album__data__date', '-score')
+        new_releases = (
+            reviews
+                .filter(album__data__date__gte=one_month_ago_str)
+                .order_by('-album__data__date', '-score')[:10]
+        )
         nr_s = ReviewWithAlbumSerializer(new_releases, many=True)
         new_releases = nr_s.data
         response['new_releases'] = new_releases

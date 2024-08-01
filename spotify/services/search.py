@@ -63,6 +63,7 @@ def search_albums(q):
         search_results = response.json()
         
         album_ids = [album['id'] for album in search_results['albums']['items']]
+        album_ids.reverse()
         albums_datas = get_albums(album_ids)
         
         saved_albums = []

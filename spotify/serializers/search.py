@@ -14,7 +14,7 @@ class SearchSerializer(serializers.ModelSerializer):
         self.album_serializer = album_serializer or AlbumWithTracksSerializer
     
     def get_albums(self, obj):
-        albums = obj.albums.all().order_by('updated_at')
+        albums = obj.albums.all().order_by('-updated_at')
         a_s = self.album_serializer(albums, many=True)
         albums = a_s.data
         return [album['data'] for album in albums]

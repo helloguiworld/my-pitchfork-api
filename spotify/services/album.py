@@ -17,14 +17,14 @@ def clean_album(album):
         'cover': album['images'][0]['url'],
         'artists': [artist['name'] for artist in album['artists']],
         'date': album['release_date'],
+        'tracks_count': album['total_tracks'],
+        'total_tracks': album['total_tracks'],
         'tracks': [{
             'id': track['id'],
             'name': track['name'],
             'artists': [artist['name'] for artist in track['artists']],
             'number': index+1,
         } for index, track in enumerate(album['tracks']['items'])],
-        'tracks_count': album['total_tracks'],
-        'total_tracks': album['total_tracks'],
     }
 
 def save_album(album_data):

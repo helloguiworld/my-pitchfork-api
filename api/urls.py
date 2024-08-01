@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import AccountViewSet, ShareClickViewSet, SearchClickViewSet, AlbumClickViewSet, ReviewViewSet
-from .views.my import MyAccountView, MyReviewsView, MyProfileView
+from .views.account.my import MyAccountView, MyReviewsView, MyProfileView
 
 router = DefaultRouter()
 router.register(r'accounts', AccountViewSet, basename='accounts')

@@ -1,4 +1,4 @@
-from .account import AccountSerializer
+from .account import AccountSerializer, AccountSummarySerializer
 from .click import (
     SearchClickSerializer,
     AlbumClickSerializer,

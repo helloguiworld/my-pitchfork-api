@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from common.permissions import IsAdminOrPostOnly
-from ..models import Account
-from ..serializers import AccountSerializer
+from ...models import Account
+from ...serializers import AccountSerializer
 
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()

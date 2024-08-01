@@ -7,10 +7,10 @@ class IsSafe(BasePermission):
 
 class IsMyOriginOrAdmin(BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_authenticated and request.user.is_staff:
-            return True
         if os.getenv('PRODUCTION'):
-            return request.META.get('HTTP_ORIGIN') == 'https://mypitchfork.fun'
+            if (request.META.get('HTTP_ORIGIN') == 'https://mypitchfork.fun'):
+                return True
+            return request.user.is_authenticated and request.user.is_staff
         return True
 
 class IsAdminOrPostOnly(BasePermission):

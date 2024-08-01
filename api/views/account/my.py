@@ -60,19 +60,23 @@ class MyProfileView(viewsets.ViewSet):
         response['reviews_count'] = reviews.count()
         
         # NEW RELEASES (1 month = 4 weeks, max 10)
+        max_new_releases = 10
+        response['min_new_releases_to_unlock'] = 5
         one_month_ago = timezone.now() - timezone.timedelta(weeks=4)
         one_month_ago_str = one_month_ago.date().isoformat()
         new_releases = (
             reviews
                 .filter(album__data__date__gte=one_month_ago_str)
-                .order_by('-album__data__date', '-score', '-is_best_new')[:10]
+                .order_by('-album__data__date', '-score', '-is_best_new')[:max_new_releases]
         )
         nr_s = ReviewWithAlbumSerializer(new_releases, many=True)
         new_releases = nr_s.data
         response['new_releases'] = new_releases
         
         # LATEST (max 20)
-        latest = reviews[:20]
+        max_latest = 20
+        response['min_latest_to_unlock'] = 10
+        latest = reviews[:max_latest]
         l_s = ReviewWithAlbumSerializer(latest, many=True)
         latest = l_s.data
         response['latest'] = latest

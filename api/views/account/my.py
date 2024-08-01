@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.utils import timezone
 from common.permissions import IsMyOriginOrAdmin
 from ...serializers import (
     AccountSerializer,
@@ -45,22 +46,33 @@ class MyProfileView(viewsets.ViewSet):
         
         response = {}
         
+        # ACCOUNT OWNER FLAG
         user = request.user
         is_account_owner = user == account.user
         response['is_account_owner'] = is_account_owner
         
+        # ACCOUNT
         a_s = AccountSerializer(account) if is_account_owner else AccountSummarySerializer(account)
         response['account'] = a_s.data
         
-        reviews = Review.objects.filter(account=account).order_by('-score', '-created_at')
-        
+        # REVIEWS COUNT
+        reviews = Review.objects.filter(account=account).order_by('-created_at')
         response['reviews_count'] = reviews.count()
         
-        top = reviews[:3]
-        t_s = ReviewWithAlbumSerializer(top, many=True)
-        top = t_s.data
-        response['top'] = top
-            
+        # NEW RELEASES (1 month = 4 weeks)
+        one_month_ago = timezone.now() - timezone.timedelta(weeks=4)
+        one_month_ago_str = one_month_ago.date().isoformat()
+        new_releases = reviews.filter(album__data__date__gte=one_month_ago_str).order_by('-album__data__date', '-score')
+        nr_s = ReviewWithAlbumSerializer(new_releases, many=True)
+        new_releases = nr_s.data
+        response['new_releases'] = new_releases
+        
+        # LATEST (max 10)
+        latest = reviews[:10]
+        l_s = ReviewWithAlbumSerializer(latest, many=True)
+        latest = l_s.data
+        response['latest'] = latest
+        
         return Response(response)
 
 

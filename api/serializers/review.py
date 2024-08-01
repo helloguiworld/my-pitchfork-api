@@ -70,7 +70,7 @@ class ReviewSummarySerializer(ReviewSerializer):
         fields = ['album', 'score', 'is_best_new', 'track_scores']
 
 # ---------------------------------------------------------------------
-        
+
 class ReviewWithAlbumSerializer(ReviewSerializer):
     album = serializers.SerializerMethodField()
 

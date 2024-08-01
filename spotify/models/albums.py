@@ -9,6 +9,10 @@ class Album(models.Model):
     @property
     def name(self):
         return self.data.get('name', '')
+    
+    @property
+    def date(self):
+        return self.data.get('date', '')
 
     def __str__(self):
         return self.name

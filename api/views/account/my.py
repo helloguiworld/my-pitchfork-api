@@ -71,8 +71,8 @@ class MyProfileView(viewsets.ViewSet):
         new_releases = nr_s.data
         response['new_releases'] = new_releases
         
-        # LATEST (max 10)
-        latest = reviews[:10]
+        # LATEST (max 20)
+        latest = reviews[:20]
         l_s = ReviewWithAlbumSerializer(latest, many=True)
         latest = l_s.data
         response['latest'] = latest

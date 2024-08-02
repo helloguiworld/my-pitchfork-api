@@ -19,13 +19,14 @@ class AlbumRankingViewSet(viewsets.ViewSet):
                 .filter(data__date__gte=one_month_ago_str)
                 .annotate(reviews_count=Count('reviews'))
                 .filter(reviews_count__gt=0)
-                .annotate(reviews_score_avg=Avg('reviews__score'), reviews_score_sum=Avg('reviews__score'))
+                .annotate(reviews_score_avg=Avg('reviews__score'), reviews_score_sum=Sum('reviews__score'))
                 .order_by('-reviews_score_sum', '-reviews_count', '-data__date', 'data__name')[:max_new_releases_ranking]
         )
         new_releases_ranking = [{
             "position": position,
             "album": album.data,
             "reviews_count": album.reviews_count,
+            "reviews_sum": album.reviews_score_sum,
             "reviews_avg": round(album.reviews_score_avg, 1),
         } for position, album in enumerate(new_releases_albums, start=1)]
         return Response(new_releases_ranking)
@@ -38,13 +39,14 @@ class AlbumRankingViewSet(viewsets.ViewSet):
             Album.objects
                 .annotate(reviews_count=Count('reviews')) 
                 .filter(reviews_count__gt=0)
-                .annotate(reviews_score_avg=Avg('reviews__score'), reviews_score_sum=Avg('reviews__score'))
+                .annotate(reviews_score_avg=Avg('reviews__score'), reviews_score_sum=Sum('reviews__score'))
                 .order_by('-reviews_score_sum', '-reviews_count', '-data__date', 'data__name')[:max_all_ranking]
         )
         all_ranking = [{
             "position": position,
             "album": album.data,
             "reviews_count": album.reviews_count,
+            "reviews_sum": album.reviews_score_sum,
             "reviews_avg": round(album.reviews_score_avg, 1),
         } for position, album in enumerate(all_albums, start=1)]
         return Response(all_ranking)

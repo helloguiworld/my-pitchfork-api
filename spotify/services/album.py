@@ -5,7 +5,7 @@ from datetime import timedelta
 from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 from . import get_spotify_token
 from ..models import Album, Track
-from ..serializers import AlbumWithTracksSerializer
+from ..serializers import AlbumCompleteSerializer
 
 MAX_ALBUM_STORAGE_TIME = timedelta(hours=12)
 
@@ -23,6 +23,7 @@ def clean_album(album):
             'id': track['id'],
             'name': track['name'],
             'artists': [artist['name'] for artist in track['artists']],
+            'explicit': track['explicit'],
             'number': index+1,
         } for index, track in enumerate(album['tracks']['items'])],
     }
@@ -30,6 +31,9 @@ def clean_album(album):
 def save_album(album_data):
     album = clean_album(album_data)
     tracks = album.pop('tracks')
+    
+    explicit = any(track['explicit'] for track in tracks)
+    album['explicit'] = explicit
     
     saved_album, _ = Album.objects.update_or_create(
         id=album['id'],
@@ -58,7 +62,7 @@ def get_album(id):
         print('----time now:   ', timezone.now())
         if timezone.now() - album.updated_at < MAX_ALBUM_STORAGE_TIME:
             print(f'GOT STORED ALBUM {album}')
-            album_serializer = AlbumWithTracksSerializer(album)
+            album_serializer = AlbumCompleteSerializer(album)
             return album_serializer.data['data']
     except Album.DoesNotExist:
         print(f'NEW ALBUM {id}')
@@ -79,7 +83,7 @@ def get_album(id):
         album_result = response.json()
         saved_album = save_album(album_result)
         print('SAVED ALBUM')
-        album_serializer = AlbumWithTracksSerializer(saved_album)
+        album_serializer = AlbumCompleteSerializer(saved_album)
         return album_serializer.data['data']
     elif response.status_code == 401:
         raise InvalidSpotifyToken

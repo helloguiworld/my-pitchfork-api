@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Search
-from .album import AlbumSerializer, AlbumWithTracksSerializer
+from .album import AlbumSerializer, AlbumCompleteSerializer
 
 class SearchSerializer(serializers.ModelSerializer):
     albums = serializers.SerializerMethodField()
@@ -11,7 +11,7 @@ class SearchSerializer(serializers.ModelSerializer):
         
     def __init__(self, *args, album_serializer=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.album_serializer = album_serializer or AlbumWithTracksSerializer
+        self.album_serializer = album_serializer or AlbumCompleteSerializer
     
     def get_albums(self, obj):
         albums = obj.albums.all().order_by('-updated_at')

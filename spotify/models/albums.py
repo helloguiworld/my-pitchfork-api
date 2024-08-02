@@ -11,8 +11,16 @@ class Album(models.Model):
         return self.data.get('name', '')
     
     @property
+    def artists(self):
+        return self.data.get('artists', '')
+    
+    @property
     def date(self):
         return self.data.get('date', '')
+    
+    @property
+    def reviews_count(self):
+        return self.reviews.count()
 
     def __str__(self):
         return self.name

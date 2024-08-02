@@ -59,9 +59,9 @@ class MyProfileView(viewsets.ViewSet):
         reviews = Review.objects.filter(account=account).order_by('-created_at')
         response['reviews_count'] = reviews.count()
         
-        # NEW RELEASES (1 month = 4 weeks, max 10)
-        max_new_releases = 10
-        response['min_new_releases_to_unlock'] = 5
+        # NEW RELEASES (1 month = 4 weeks, max 8)
+        max_new_releases = 12
+        response['min_new_releases_to_unlock'] = 4
         one_month_ago = timezone.now() - timezone.timedelta(weeks=4)
         one_month_ago_str = one_month_ago.date().isoformat()
         new_releases = (

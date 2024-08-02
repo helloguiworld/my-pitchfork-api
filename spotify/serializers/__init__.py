@@ -1,6 +1,6 @@
 from .album import (
     TrackSerializer,
     AlbumSerializer,
-    AlbumWithTracksSerializer,
+    AlbumCompleteSerializer,
 )
 from .search import SearchSerializer, SearchSummarySerializer

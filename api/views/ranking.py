@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Sum
 from common.permissions import IsMyOriginOrAdmin
 from spotify.models import Album
 
@@ -19,8 +19,8 @@ class AlbumRankingViewSet(viewsets.ViewSet):
                 .filter(data__date__gte=one_month_ago_str)
                 .annotate(reviews_count=Count('reviews'))
                 .filter(reviews_count__gt=0)
-                .annotate(reviews_score_avg=Avg('reviews__score'))
-                .order_by('-reviews_count', '-reviews_score_avg', '-data__date', 'data__name')[:max_new_releases_ranking]
+                .annotate(reviews_score_avg=Avg('reviews__score'), reviews_score_sum=Avg('reviews__score'))
+                .order_by('-reviews_score_sum', '-reviews_count', '-data__date', 'data__name')[:max_new_releases_ranking]
         )
         new_releases_ranking = [{
             "position": position,
@@ -38,8 +38,8 @@ class AlbumRankingViewSet(viewsets.ViewSet):
             Album.objects
                 .annotate(reviews_count=Count('reviews')) 
                 .filter(reviews_count__gt=0)
-                .annotate(reviews_score_avg=Avg('reviews__score'))
-                .order_by('-reviews_count', '-reviews_score_avg', '-data__date', 'data__name')[:max_all_ranking]
+                .annotate(reviews_score_avg=Avg('reviews__score'), reviews_score_sum=Avg('reviews__score'))
+                .order_by('-reviews_score_sum', '-reviews_count', '-data__date', 'data__name')[:max_all_ranking]
         )
         all_ranking = [{
             "position": position,

@@ -2,10 +2,14 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import AccountViewSet, ShareClickViewSet, SearchClickViewSet, AlbumClickViewSet, ReviewViewSet
 from .views.account.my import MyAccountView, MyReviewsView, MyProfileView
+from .views.ranking import AlbumRankingViewSet
 
 router = DefaultRouter()
 router.register(r'accounts', AccountViewSet, basename='accounts')
 router.register(r'reviews', ReviewViewSet, basename='reviews')
+
+ranking_router = DefaultRouter()
+ranking_router.register(r'album', AlbumRankingViewSet, basename='album')
 
 my_router = DefaultRouter()
 my_router.register(r'account', MyAccountView, basename='my-account')
@@ -19,6 +23,7 @@ report_router.register(r'share-click', ShareClickViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('ranking/', include(ranking_router.urls)),
     path('my/', include(my_router.urls)),
     path('report/', include(report_router.urls)),
 ]

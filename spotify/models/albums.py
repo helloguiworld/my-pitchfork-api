@@ -17,10 +17,6 @@ class Album(models.Model):
     @property
     def date(self):
         return self.data.get('date', '')
-    
-    @property
-    def reviews_count(self):
-        return self.reviews.count()
 
     def __str__(self):
         return self.name

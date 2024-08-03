@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils import timezone
@@ -11,6 +11,7 @@ from ...serializers import (
 )
 from ...models import Account, Review
 from ...permissions import HasAccount, IsAccountOwner
+from ...paginations import ReviewPagination
 
 class MyAccountView(viewsets.ViewSet):
     permission_classes = [HasAccount]
@@ -21,18 +22,30 @@ class MyAccountView(viewsets.ViewSet):
         a_s = AccountSerializer(account)
         return Response(a_s.data)
 
+
 class MyReviewsView(viewsets.ModelViewSet):
-    lookup_field = 'album'
-    serializer_class = ReviewSummarySerializer
     permission_classes = [IsAccountOwner]
+    lookup_field = 'album'
+    
+    pagination_class = ReviewPagination
+    
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['album__data__name', 'album__data__artists']
+    ordering_fields = ['created_at', 'score']
 
     def get_queryset(self):
         account = self.request.user.account
-        return Review.objects.filter(account=account)
+        return Review.objects.filter(account=account).order_by('-created_at', '-score')
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ReviewWithAlbumSerializer
+        return ReviewSummarySerializer
 
     def perform_create(self, serializer):
         account = self.request.user.account
         serializer.save(account=account)
+
 
 class MyProfileView(viewsets.ViewSet):
     permission_classes = [IsMyOriginOrAdmin]
@@ -59,8 +72,8 @@ class MyProfileView(viewsets.ViewSet):
         reviews = Review.objects.filter(account=account).order_by('-created_at')
         response['reviews_count'] = reviews.count()
         
-        # NEW RELEASES (1 month = 4 weeks, max 8)
-        max_new_releases = 12
+        # NEW RELEASES (1 month = 4 weeks, max 10)
+        max_new_releases = 10
         response['min_new_releases_to_unlock'] = 4
         one_month_ago = timezone.now() - timezone.timedelta(weeks=4)
         one_month_ago_str = one_month_ago.date().isoformat()
@@ -75,7 +88,7 @@ class MyProfileView(viewsets.ViewSet):
         
         # LATEST (max 20)
         max_latest = 20
-        response['min_latest_to_unlock'] = 10
+        response['min_latest_to_unlock'] = 8
         latest = reviews[:max_latest]
         l_s = ReviewWithAlbumSerializer(latest, many=True)
         latest = l_s.data

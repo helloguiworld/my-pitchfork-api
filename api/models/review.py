@@ -5,7 +5,7 @@ from ..models import Account
 from spotify.models import Album, Track
 
 class Review(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, related_name='reviews', on_delete=models.CASCADE)
     album = models.ForeignKey(Album, related_name='reviews', on_delete=models.PROTECT)
     
     score = models.DecimalField(

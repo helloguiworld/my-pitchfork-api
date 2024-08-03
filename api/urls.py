@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import AccountViewSet, ShareClickViewSet, SearchClickViewSet, AlbumClickViewSet, ReviewViewSet
 from .views.account.my import MyAccountView, MyReviewsView, MyProfileView
-from .views.ranking import AlbumRankingViewSet
+from .views.ranking import AlbumRankingViewSet, AccountRankingViewSet
 
 router = DefaultRouter()
 router.register(r'accounts', AccountViewSet, basename='accounts')
@@ -10,6 +10,7 @@ router.register(r'reviews', ReviewViewSet, basename='reviews')
 
 ranking_router = DefaultRouter()
 ranking_router.register(r'album', AlbumRankingViewSet, basename='album')
+ranking_router.register(r'account', AccountRankingViewSet, basename='account')
 
 my_router = DefaultRouter()
 my_router.register(r'account', MyAccountView, basename='my-account')

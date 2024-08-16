@@ -95,6 +95,4 @@ class MyProfileView(viewsets.ViewSet):
         response['latest'] = latest
         
         return Response(response)
-
-
         

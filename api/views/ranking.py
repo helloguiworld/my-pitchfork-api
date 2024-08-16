@@ -2,13 +2,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
-from django.db.models import Count, Avg, Sum, DateField, F
+from django.db.models import Count, Avg, Sum, F, DateField, IntegerField, FloatField, Case, When, Value
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, ExtractDay
+from django.db import connection
 from dateutil.relativedelta import relativedelta
 from common.permissions import IsMyOriginOrAdmin
 from spotify.models import Album
-from api.models import Account
 from ..services.ranking import get_all_accounts_ranking
 
 class AlbumRankingViewSet(viewsets.ViewSet):
@@ -22,7 +22,12 @@ class AlbumRankingViewSet(viewsets.ViewSet):
         one_month_ago_str = one_month_ago.date().isoformat()
         
         today_base = timezone.now().date()
-        one_day_in_microseconds = 24*60*60*10**6
+        
+        if connection.vendor == 'postgresql':
+            days_since_release = ExtractDay(today_base - F('release_date'))
+        else:
+            one_day_in_microseconds = 24*60*60*10**6
+            days_since_release = Cast(today_base - F('release_date'), IntegerField()) / one_day_in_microseconds
         
         new_releases_albums = (
             Album.objects
@@ -33,8 +38,8 @@ class AlbumRankingViewSet(viewsets.ViewSet):
                     reviews_score_avg=Avg('reviews__score'),
                     reviews_score_sum=Sum('reviews__score'),
                     release_date=Cast(KeyTextTransform('date', 'data'), DateField()),
-                    days_since_release=ExtractDay(today_base - F('release_date')) + 1,
-                    reviews_score_per_day=F('reviews_score_sum') / F('days_since_release'),
+                    days_since_release=days_since_release,
+                    reviews_score_per_day=Cast(F('reviews_score_sum'), FloatField()) / Case(When(days_since_release=0, then=Value(1)), default=F('days_since_release')),
                 )
                 .order_by('-reviews_score_per_day', '-reviews_score_sum', '-reviews_count', '-data__date', 'data__name')[:max_new_releases_ranking]
         )

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Count, Avg, Sum, F, DateField, IntegerField, FloatField, Case, When, Value
 from django.db.models.fields.json import KeyTextTransform
-from django.db.models.functions import Cast, ExtractDay
+from django.db.models.functions import Cast, ExtractDay, Power, Greatest
 from django.db import connection
 from dateutil.relativedelta import relativedelta
 from common.permissions import IsMyOriginOrAdmin
@@ -28,6 +28,8 @@ class AlbumRankingViewSet(viewsets.ViewSet):
         else:
             one_day_in_microseconds = 24*60*60*10**6
             days_since_release = Cast(today_base - F('release_date'), IntegerField()) / one_day_in_microseconds
+            
+        ranking_factor = Cast(F('reviews_score_sum'), FloatField()) / (Power(Greatest(F('days_since_release') + Value(1), 1), 1.2))
         
         new_releases_albums = (
             Album.objects
@@ -39,9 +41,9 @@ class AlbumRankingViewSet(viewsets.ViewSet):
                     reviews_score_sum=Sum('reviews__score'),
                     release_date=Cast(KeyTextTransform('date', 'data'), DateField()),
                     days_since_release=days_since_release,
-                    reviews_score_per_day=Cast(F('reviews_score_sum'), FloatField()) / Case(When(days_since_release=0, then=Value(1)), default=F('days_since_release')),
+                    ranking_factor=ranking_factor,
                 )
-                .order_by('-reviews_score_per_day', '-reviews_score_sum', '-reviews_count', '-data__date', 'data__name')[:max_new_releases_ranking]
+                .order_by('-ranking_factor', '-reviews_score_sum', '-reviews_count', '-data__date', 'data__name')[:max_new_releases_ranking]
         )
         new_releases_ranking = [{
             "position": position,
@@ -50,7 +52,7 @@ class AlbumRankingViewSet(viewsets.ViewSet):
             "reviews_score_avg": round(album.reviews_score_avg, 1),
             "reviews_score_sum": album.reviews_score_sum,
             "days_since_release": album.days_since_release,
-            "reviews_score_per_day": album.reviews_score_per_day,
+            "ranking_factor": album.ranking_factor,
         } for position, album in enumerate(new_releases_albums, start=1)]
         return Response(new_releases_ranking)
 

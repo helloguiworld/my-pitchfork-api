@@ -4,7 +4,7 @@ from ...serializers import ReviewSerializer
 from ...paginations import ReviewPagination
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
+    queryset = Review.objects.all().order_by('created_at')
     serializer_class = ReviewSerializer
     
     pagination_class = ReviewPagination

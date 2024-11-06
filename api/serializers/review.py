@@ -67,7 +67,7 @@ class ReviewSummarySerializer(ReviewSerializer):
     
     class Meta:
         model = Review
-        fields = ['album', 'score', 'is_best_new', 'track_scores']
+        fields = ['album', 'score', 'is_best_new', 'text', 'track_scores']
 
 # ---------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ class ReviewWithAlbumSerializer(ReviewSerializer):
 
     class Meta:
         model = Review
-        fields = ['album', 'score', 'is_best_new']
+        fields = ['album', 'score', 'is_best_new', 'text']
     
     def get_album(self, obj):
         return obj.album.data

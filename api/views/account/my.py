@@ -58,11 +58,16 @@ class MyProfileView(viewsets.ViewSet):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         response = {}
+        user = request.user
         
         # ACCOUNT OWNER FLAG
-        user = request.user
         is_account_owner = user == account.user
         response['is_account_owner'] = is_account_owner
+        
+        # AUTH USER FOLLOW FLAGS
+        if not is_account_owner and user.is_authenticated and user.account:
+            response['is_followed_by'] = account.is_following(user.account)
+            response['is_following'] = account.is_followed_by(user.account) 
         
         # ACCOUNT
         a_s = AccountSerializer(account) if is_account_owner else AccountSummarySerializer(account)
@@ -95,4 +100,37 @@ class MyProfileView(viewsets.ViewSet):
         response['latest'] = latest
         
         return Response(response)
+
+    @action(detail=False, methods=['post'], url_path='(?P<username>[^/]+)/follow', permission_classes=[HasAccount])
+    def follow(self, request, username=None):
+        try:
+            account_to_follow = Account.objects.get(user__username=username)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
+        user = request.user
+        if not hasattr(user, 'account'):
+            return Response({'error': 'User account not found'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if user.account == account_to_follow:
+            return Response({'error': 'You cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.account.follow(account_to_follow)
+        return Response({'status': 'followed'})
+        
+    @action(detail=False, methods=['post'], url_path='(?P<username>[^/]+)/unfollow', permission_classes=[HasAccount])
+    def unfollow(self, request, username=None):
+        try:
+            account_to_unfollow = Account.objects.get(user__username=username)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        if not hasattr(user, 'account'):
+            return Response({'error': 'User account not found'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if user.account == account_to_unfollow:
+            return Response({'error': 'You cannot unfollow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.account.unfollow(account_to_unfollow)
+        return Response({'status': 'unfollowed'})

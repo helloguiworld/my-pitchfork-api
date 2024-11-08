@@ -12,3 +12,4 @@ from .review import (
     ReviewWithAlbumSerializer,
     ReviewWithAlbumAndTrackScoresSerializer,
 )
+from .feed import FeedSerializer

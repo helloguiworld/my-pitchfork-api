@@ -7,6 +7,7 @@ from rest_framework import status, serializers
 
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.safestring import mark_safe
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
@@ -30,15 +31,16 @@ class PasswordResetRequestView(APIView):
         
         token = default_token_generator.make_token(user)
         u_id = urlsafe_base64_encode(force_bytes(user.pk))
-        base_url = "https://mypitchfork.fun/" if os.environ.get('PRODUCTION') else "http://localhost:8000/"
+        base_url = "https://mypitchfork.fun/" if os.environ.get('PRODUCTION') else "http://192.168.0.14:5173/"
         
-        password_reset_url = f"{base_url}users/password-reset/{u_id}/{token}/"
+        password_reset_url = f"{base_url}password-reset?u_id={u_id}&token={token}"
         
         subject = "Your myPitchfork Password Reset"
         email_template_name = "password_reset_email.txt"
         context = {
-            "password_reset_url": password_reset_url,
+            "password_reset_url": mark_safe(password_reset_url),
         }
+        print(context)
         email_content = render_to_string(email_template_name, context)
         
         try:
@@ -49,11 +51,7 @@ class PasswordResetRequestView(APIView):
                 [email],
                 fail_silently=False
             )
-            print(f"PASSWORD RESET EMAIL SENT: {email}")
-            if os.environ.get('PRODUCTION'):
-                return Response({"success": "Password reset email sent"})
-            else:
-                return Response({"success": "Password reset email sent", "password_reset_url": password_reset_url})
+            return Response({"success": "Password reset email sent"})        
         except Exception as e:
             print(f"FAIL TO SENT PASSWORD RESET EMAIL: {email}")
             print(f"ERROR: {e}")
@@ -79,11 +77,8 @@ class PasswordResetView(APIView):
                 user.set_password(new_password)
                 user.save()
                 Token.objects.filter(user=user).delete()
-                if os.environ.get('PRODUCTION'):
-                    return Response({"success": "Password has been reset"})
-                else:
-                    return Response({"success": "Password has been reset", "username": user.username})
+                return Response({"success": "Password has been reset"})
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"error": "Invalid token or user ID."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid token or user ID."}, status=status.HTTP_404_NOT_FOUND)

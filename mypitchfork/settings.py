@@ -176,7 +176,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 
 # Email
-if os.environ.get('PRODUCTION') and os.environ.get('EMAIL_BACKEND'):
+if os.environ.get('EMAIL_BACKEND'):
     EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
     EMAIL_HOST = os.environ.get('EMAIL_HOST')
     EMAIL_PORT = os.environ.get('EMAIL_PORT')

@@ -1,6 +1,7 @@
 import requests
 from django.utils import timezone
 from django.db.models import Count
+from django.db.models.deletion import ProtectedError
 from datetime import timedelta
 from ..exceptions import InvalidSpotifyToken, SpotifyResponseException
 from . import get_spotify_token
@@ -134,4 +135,35 @@ def old_albums(days=1, detailed=False, clean=False):
             response_data['deleted_count'] = deleted_count
     
         return response_data
-    
+
+def old_albums2(days=1, detailed=False, clean=False):
+    now = timezone.now()
+    limit_date = now - timezone.timedelta(days=days)
+    albums_to_delete = (Album.objects
+        .annotate(reviews_count=Count('reviews'))
+        .filter(updated_at__lte=limit_date, reviews_count__exact=0)
+    )
+
+    count = albums_to_delete.count()
+    response_data = {
+        'days': days,
+        'now': now,
+        'limit': limit_date,
+        'count': count,
+    }
+
+    if detailed:
+        response_data['albums'] = [a.name for a in albums_to_delete]
+
+    if clean:
+        deleted_total = 0
+        for album in albums_to_delete:
+            try:
+                deleted_count, _ = album.delete()
+                deleted_total += deleted_count
+            except ProtectedError:
+                # Ignora álbuns que não podem ser deletados e continua
+                continue
+        response_data['deleted_count'] = deleted_total
+
+    return response_data

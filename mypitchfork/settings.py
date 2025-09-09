@@ -87,7 +87,11 @@ else:
     CORS_ORIGIN_ALLOW_ALL = True
 
 if os.environ.get('PRODUCTION'):
-    ALLOWED_HOSTS = ['api.mypitchfork.fun', 'admin.mypitchfork.fun']
+    ALLOWED_HOSTS = [
+        'api.mypitchfork.fun',
+        'admin.mypitchfork.fun',
+        'mypitchfork-api.up.railway.app',
+    ]
 else:
     ALLOWED_HOSTS = ['*']
 

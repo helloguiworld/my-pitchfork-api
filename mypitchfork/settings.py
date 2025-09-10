@@ -78,24 +78,33 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# CORS and CSRF settings
 if os.environ.get('PRODUCTION'):
-    # CORS_ALLOW_METHODS = ['GET']
+    # Allowed frontends in production
     CORS_ALLOWED_ORIGINS = [
         "https://mypitchfork.fun",
         "https://api.mypitchfork.fun",
         "https://mypitchfork-api.up.railway.app",
     ]
-else:
-    CORS_ORIGIN_ALLOW_ALL = True
-
-if os.environ.get('PRODUCTION'):
+    
+    # Allowed hosts for Django
     ALLOWED_HOSTS = [
         'api.mypitchfork.fun',
         'admin.mypitchfork.fun',
         'mypitchfork-api.up.railway.app',
     ]
+    
+    # Trusted origins for CSRF
+    CSRF_TRUSTED_ORIGINS = [
+        'https://mypitchfork.fun',
+        'https://api.mypitchfork.fun',
+        'https://mypitchfork-api.up.railway.app',
+    ]
 else:
+    # Development environment
+    CORS_ORIGIN_ALLOW_ALL = True
     ALLOWED_HOSTS = ['*']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
 
 ROOT_URLCONF = 'mypitchfork.urls'
 

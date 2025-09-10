@@ -83,6 +83,7 @@ if os.environ.get('PRODUCTION'):
     CORS_ALLOWED_ORIGINS = [
         "https://mypitchfork.fun",
         "https://api.mypitchfork.fun",
+        "https://mypitchfork-api.up.railway.app",
     ]
 else:
     CORS_ORIGIN_ALLOW_ALL = True

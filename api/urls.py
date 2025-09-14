@@ -4,6 +4,7 @@ from .views import ShareClickViewSet, SearchClickViewSet, AlbumClickViewSet
 from .views.account import AccountViewSet, ReviewViewSet, FeedViewSet
 from .views.account.my import MyAccountView, MyReviewsView, MyProfileView
 from .views.ranking import AlbumRankingViewSet, AccountRankingViewSet
+from .views.proxy import ProxyView
 
 router = DefaultRouter()
 router.register(r'accounts', AccountViewSet, basename='accounts')
@@ -26,6 +27,7 @@ report_router.register(r'share-click', ShareClickViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("proxy/", ProxyView.as_view(), name="proxy"),
     path('ranking/', include(ranking_router.urls)),
     path('my/', include(my_router.urls)),
     path('report/', include(report_router.urls)),

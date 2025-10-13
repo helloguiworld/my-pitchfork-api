@@ -33,6 +33,7 @@ class AlbumRankingViewSet(viewsets.ViewSet):
         
         new_releases_albums = (
             Album.objects
+                .filter(data__date__regex=r'^\d{4}-\d{2}-\d{2}$')
                 .filter(data__date__gte=one_month_ago_str)
                 .annotate(reviews_count=Count('reviews'))
                 .filter(reviews_count__gt=0)

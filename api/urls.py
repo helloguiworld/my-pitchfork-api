@@ -5,6 +5,7 @@ from .views.account import AccountViewSet, ReviewViewSet, FeedViewSet
 from .views.account.my import MyAccountView, MyReviewsView, MyProfileView
 from .views.ranking import AlbumRankingViewSet, AccountRankingViewSet
 from .views.proxy import ProxyView
+from common import TestSMTPView
 
 router = DefaultRouter()
 router.register(r'accounts', AccountViewSet, basename='accounts')
@@ -31,4 +32,6 @@ urlpatterns = [
     path('ranking/', include(ranking_router.urls)),
     path('my/', include(my_router.urls)),
     path('report/', include(report_router.urls)),
+    
+    path('test-smtp/', TestSMTPView.as_view(), name='test_smtp'),
 ]

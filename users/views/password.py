@@ -10,7 +10,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
-from django.core.mail import send_mail
+
+import resend
 
 from ..serializers import CustomUserSerializer as UserSerializer
 from users.models import CustomUser as User
@@ -32,7 +33,6 @@ class PasswordResetRequestView(APIView):
         token = default_token_generator.make_token(user)
         u_id = urlsafe_base64_encode(force_bytes(user.pk))
         base_url = "https://mypitchfork.fun/" if os.environ.get('PRODUCTION') else "http://192.168.0.14:5173/"
-        
         password_reset_url = f"{base_url}password-reset?u_id={u_id}&token={token}"
         
         subject = "Your myPitchfork Password Reset"
@@ -44,14 +44,18 @@ class PasswordResetRequestView(APIView):
         email_content = render_to_string(email_template_name, context)
         
         try:
-            send_mail(
-                subject,
-                email_content,
-                'mypitchfork.fun@gmail.com',
-                [email],
-                fail_silently=False
-            )
-            return Response({"success": "Password reset email sent"})        
+            email_from = os.environ.get("RESEND_EMAIL_FROM")
+            email_reply_to = os.environ.get("RESEND_EMAIL_REPLY_TO")
+
+            resend.api_key = os.environ.get("RESEND_API_KEY")
+            resend.Emails.send({
+                "from": f"MyPitchfork <{email_from}>",
+                "reply_to": email_reply_to,
+                "to": [email],
+                "subject": subject,
+                "html": email_content,
+            })
+            return Response({"success": "Password reset email sent"})
         except Exception as e:
             print(f"FAIL TO SENT PASSWORD RESET EMAIL: {email}")
             print(f"ERROR: {e}")
